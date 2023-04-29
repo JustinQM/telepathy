@@ -1,23 +1,18 @@
-#include <windows.h>
-#include <winuser.h>
-#include <tlhelp32.h>
-
 typedef struct Telepathy
 {
-	HANDLE hProc;
-	UINT64 pID;
-	UINT64 dllAddress;
+	void* internal;
 }Telepathy;
+
 
 void TELEPATHY_INIT(Telepathy* telepathy);
 
-HANDLE TELEPATHY_GET_WINDOW_HANDLE(Telepathy* telepathy, LPCSTR name);
+void TELEPATHY_GET_WINDOW_HANDLE(Telepathy* telepathy, char* name);
 
-UINT64 TELEPATHY_GET_DLL_ADDRESS(Telepathy* telepathy, LPCSTR name);
+unsigned long long int TELEPATHY_GET_DLL_ADDRESS(Telepathy* telepathy, char* name);
 
-void TELEPATHY_SEND_KEYBOARD_INPUT(UINT key);
+void TELEPATHY_SEND_KEYBOARD_INPUT(unsigned long int key);
 
-UINT64 TELEPATHY_LOAD_UINT(Telepathy* telepathy, UINT64 address);
-INT64 TELEPATHY_LOAD_INT(Telepathy* telepathy, UINT64 address);
-BYTE TELEPATHY_LOAD_BYTE(Telepathy* telepathy, UINT64 address);
-FLOAT TELEPATHY_LOAD_FLOAT(Telepathy* telepathy, UINT64 address);
+unsigned long long int TELEPATHY_LOAD_UINT(Telepathy* telepathy, unsigned long long int address);
+long long int TELEPATHY_LOAD_INT(Telepathy* telepathy, unsigned long long int address);
+char TELEPATHY_LOAD_BYTE(Telepathy* telepathy, unsigned long long int address);
+float TELEPATHY_LOAD_FLOAT(Telepathy* telepathy, unsigned long long int address);

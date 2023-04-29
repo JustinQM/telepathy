@@ -1,13 +1,34 @@
 #include "telepathy.h"
 
+//Windows Specific
+#ifdef _WIN32
+
+#include <windows.h>
+#include <winuser.h>
+#include <tlhelp32.h>
+
+
+typedef struct Win_Telepathy
+{
+	HANDLE hProc;
+	UINT64 pID;
+	UINT64 dllAddress;
+}Telepathy;
+
 void TELEPATHY_INIT(Telepathy* telepathy)
 {
-	telepathy->hProc = 0;
-	telepathy->dllAddress = NULL;
+	
+	telepathy->internal = malloc(sizeof(Win_Telepathy));
+	Win_Telepathy *win_telepathy = (Win_Telepathy*)telepathy->internal;
+
+	win_telepathy->hProc = 0;
+	win_telepathy->dllAddress = NULL;
 }
 
-HANDLE TELEPATHY_GET_WINDOW_HANDLE(Telepathy* telepathy, LPCSTR name)
+void TELEPATHY_GET_WINDOW_HANDLE(Telepathy* telepathy, char* name)
 {
+	
+	Win_Telepathy *win_telepathy = (Win_Telepathy*)telepathy->internal;
 	//Finding Proccess
 	HANDLE handle = NULL;
 
@@ -20,7 +41,7 @@ HANDLE TELEPATHY_GET_WINDOW_HANDLE(Telepathy* telepathy, LPCSTR name)
 
 	UINT32 pID = NULL;
 	GetWindowThreadProcessId(handle, &pID);
-	telepathy->pID = pID;
+	win_telepathy->pID = pID;
 	HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS, 0, pID);
 
 	if (!hProc)
@@ -28,15 +49,17 @@ HANDLE TELEPATHY_GET_WINDOW_HANDLE(Telepathy* telepathy, LPCSTR name)
 		return NULL;
 	}
 
-	telepathy->hProc = hProc;
-	return hProc;
+	win_telepathy->hProc = hProc;
 }
 
 //Yoinked from Stack Overflow https://stackoverflow.com/questions/41552466/how-do-i-get-the-physical-baseaddress-of-an-dll-used-in-a-process
-UINT64 TELEPATHY_GET_DLL_ADDRESS(Telepathy* telepathy, LPCSTR name)
+unsigned long long int TELEPATHY_GET_DLL_ADDRESS(Telepathy* telepathy, char* name)
 {
+	Win_Telepathy *win_telepathy = (Win_Telepathy*)telepathy->internal;
+
+	
 	MODULEENTRY32 ModuleEntry = { 0 };
-	HANDLE SnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, telepathy->pID);
+	HANDLE SnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, win_telepathy->pID);
 
 	if (!SnapShot) return NULL;
 
@@ -49,7 +72,7 @@ UINT64 TELEPATHY_GET_DLL_ADDRESS(Telepathy* telepathy, LPCSTR name)
 		if (!wcscmp(ModuleEntry.szModule, name))
 		{
 			CloseHandle(SnapShot);
-			telepathy->dllAddress = (char*)ModuleEntry.modBaseAddr;
+			win_telepathy->dllAddress = (char*)ModuleEntry.modBaseAddr;
 			return (char*)ModuleEntry.modBaseAddr;
 		}
 	} while (Module32Next(SnapShot, &ModuleEntry));
@@ -58,7 +81,7 @@ UINT64 TELEPATHY_GET_DLL_ADDRESS(Telepathy* telepathy, LPCSTR name)
 	return NULL;
 }
 
-void TELEPATHY_SEND_KEYBOARD_INPUT(UINT key)
+void TELEPATHY_SEND_KEYBOARD_INPUT(unsigned long int key)
 {
 	INPUT Input[2] = { 0 };
 	Input[0].type = INPUT_KEYBOARD;
@@ -69,34 +92,44 @@ void TELEPATHY_SEND_KEYBOARD_INPUT(UINT key)
 	SendInput(ARRAYSIZE(Input), Input, sizeof(INPUT));
 }
 
-UINT64 TELEPATHY_LOAD_UINT(Telepathy* telepathy, UINT64 address)
+unsigned long long int TELEPATHY_LOAD_UINT(Telepathy* telepathy, unsigned long long int address)
 {
+	Win_Telepathy *win_telepathy = (Win_Telepathy*)telepathy->internal;
+	
 	UINT64 result = 0;
-	ReadProcessMemory(telepathy->hProc, (LPVOID*)address, &result, sizeof(UINT64), 0);
+	ReadProcessMemory(win_telepathy->hProc, (LPVOID*)address, &result, sizeof(UINT64), 0);
 
 	return result;
 }
 
-INT64 TELEPATHY_LOAD_INT(Telepathy* telepathy, UINT64 address)
+long long int TELEPATHY_LOAD_INT(Telepathy* telepathy, UINT64 address)
 {
-	UINT64 result = 0;
-	ReadProcessMemory(telepathy->hProc, (LPVOID*)address, &result, sizeof(INT), 0);
+	Win_Telepathy *win_telepathy = (Win_Telepathy*)telepathy->internal;
+	
+	INT64 result = 0;
+	ReadProcessMemory(win_telepathy->hProc, (LPVOID*)address, &result, sizeof(INT), 0);
 
 	return result;
 }
 
-BYTE TELEPATHY_LOAD_BYTE(Telepathy* telepathy, UINT64 address)
+char TELEPATHY_LOAD_BYTE(Telepathy* telepathy, unsigned long long address)
 {
+	Win_Telepathy *win_telepathy = (Win_Telepathy*)telepathy->internal;
+	
 	BYTE result = 0;
-	ReadProcessMemory(telepathy->hProc, (LPVOID*)address, &result, sizeof(BYTE), 0);
+	ReadProcessMemory(win_telepathy->hProc, (LPVOID*)address, &result, sizeof(BYTE), 0);
 
 	return result;
 }
 
-FLOAT TELEPATHY_LOAD_FLOAT(Telepathy* telepathy, UINT64 address)
+float TELEPATHY_LOAD_FLOAT(Telepathy* telepathy, unsigned long long address)
 {
+	Win_Telepathy *win_telepathy = (Win_Telepathy*)telepathy->internal;
+	
 	FLOAT result = 0;
-	ReadProcessMemory(telepathy->hProc, (LPVOID*)address, &result, sizeof(FLOAT), 0);
+	ReadProcessMemory(win_telepathy->hProc, (LPVOID*)address, &result, sizeof(FLOAT), 0);
 
 	return result;
 }
+
+#endif
