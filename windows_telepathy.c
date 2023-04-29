@@ -13,9 +13,9 @@ typedef struct Win_Telepathy
 	HANDLE hProc;
 	UINT64 pID;
 	UINT64 dllAddress;
-}Telepathy;
+}Win_Telepathy;
 
-void TELEPATHY_INIT(Telepathy* telepathy)
+void TELEPATHY_INIT(Telepathy* telepathy,char* name)
 {
 	
 	telepathy->internal = malloc(sizeof(Win_Telepathy));
@@ -23,6 +23,8 @@ void TELEPATHY_INIT(Telepathy* telepathy)
 
 	win_telepathy->hProc = 0;
 	win_telepathy->dllAddress = NULL;
+
+	TELEPATHY_GET_WINDOW_HANDLE(telepathy,name);
 }
 
 void TELEPATHY_GET_WINDOW_HANDLE(Telepathy* telepathy, char* name)
@@ -53,7 +55,7 @@ void TELEPATHY_GET_WINDOW_HANDLE(Telepathy* telepathy, char* name)
 }
 
 //Yoinked from Stack Overflow https://stackoverflow.com/questions/41552466/how-do-i-get-the-physical-baseaddress-of-an-dll-used-in-a-process
-unsigned long long int TELEPATHY_GET_DLL_ADDRESS(Telepathy* telepathy, char* name)
+void TELEPATHY_GET_DLL_ADDRESS(Telepathy* telepathy, char* name)
 {
 	Win_Telepathy *win_telepathy = (Win_Telepathy*)telepathy->internal;
 
@@ -73,7 +75,7 @@ unsigned long long int TELEPATHY_GET_DLL_ADDRESS(Telepathy* telepathy, char* nam
 		{
 			CloseHandle(SnapShot);
 			win_telepathy->dllAddress = (char*)ModuleEntry.modBaseAddr;
-			return (char*)ModuleEntry.modBaseAddr;
+			return;
 		}
 	} while (Module32Next(SnapShot, &ModuleEntry));
 
