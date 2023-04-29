@@ -2,16 +2,21 @@
 
 #ifdef __linux__
 
+#define _GNU_SOURCE
 #include <sys/types.h>
 #include <dirent.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/uio.h>
+#include <errno.h>
 
 typedef struct Linux_Telepathy
 {
-   pid_t pID; 
+    pid_t pID;
+    struct iovec iovLocal[1];
+    struct iovec iovRemote[1];
 }Linux_Telepathy;
 
 void TELEPATHY_INIT(Telepathy* telepathy,char* name)
@@ -68,13 +73,30 @@ void TELEPATHY_GET_WINDOW_HANDLE(Telepathy* telepathy, char* name)
         if(strcmp(commStr,name) == 0)
         {
             lin_telepathy->pID = (pid_t)atoi(strProcID);
-            printf("%s\n",strProcID);
             free(commStr);
             return;
         }
 
         free(commStr);
     }
+}
+
+unsigned long long int TELEPATHY_LOAD_UINT(Telepathy* telepathy, unsigned long long int address)
+{
+    Linux_Telepathy* lin_telepathy = (Linux_Telepathy*)telepathy->internal;
+
+    unsigned long long result = 0;
+
+    lin_telepathy->iovLocal[0].iov_base = &result;
+    lin_telepathy->iovLocal[0].iov_len = 64;
+
+    lin_telepathy->iovRemote[0].iov_base = (void*)address;
+    lin_telepathy->iovRemote[0].iov_len = 64;
+    ssize_t debug = process_vm_readv(lin_telepathy->pID,lin_telepathy->iovLocal,1,lin_telepathy->iovRemote,1,0);
+
+    if(debug != 64) printf("frick\n");
+
+    return (unsigned long long int)result;
 }
 
 #endif
