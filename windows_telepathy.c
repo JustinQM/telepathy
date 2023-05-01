@@ -23,9 +23,6 @@ void TELEPATHY_INIT(Telepathy* telepathy, const char* name)
 	telepathy->internal = malloc(sizeof(Win_Telepathy));
 	Win_Telepathy *win_telepathy = (Win_Telepathy*)telepathy->internal;
 
-	win_telepathy->hProc = 0;
-	win_telepathy->dllAddress = 0;
-
 	TELEPATHY_GET_WINDOW_HANDLE(telepathy,name);
 }
 
