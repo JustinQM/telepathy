@@ -188,6 +188,7 @@ void TELEPATHY_LOAD_STRING(Telepathy* telepathy, unsigned long long int address,
     for(int i = 0; i < length; i++)
     {
         *(*dest + i) = TELEPATHY_LOAD_BYTE(telepathy, address + i);
+        free(lin_telepathy->iovLocal[0].iov_base);
     }
 
     *(*dest + length) = '\0';
@@ -206,6 +207,7 @@ void TELEPATHY_LOAD_UNITYSTRING(Telepathy* telepathy, unsigned long long int add
     for(int i = 0; i < length; i++)
     {
         *(*dest + i) = TELEPATHY_LOAD_BYTE(telepathy, address + 0x14 + (i*2));
+        free(lin_telepathy->iovLocal[0].iov_base);
     }
 
     *(*dest + (length*2)) = '\0';
