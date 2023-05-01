@@ -118,7 +118,7 @@ long long int TELEPATHY_LOAD_INT(Telepathy* telepathy, UINT64 address)
 	return result;
 }
 
-char TELEPATHY_LOAD_BYTE(Telepathy* telepathy, unsigned long long address)
+char TELEPATHY_LOAD_BYTE(Telepathy* telepathy, unsigned long long int address)
 {
 	Win_Telepathy *win_telepathy = (Win_Telepathy*)telepathy->internal;
 	
@@ -128,7 +128,7 @@ char TELEPATHY_LOAD_BYTE(Telepathy* telepathy, unsigned long long address)
 	return result;
 }
 
-float TELEPATHY_LOAD_FLOAT(Telepathy* telepathy, unsigned long long address)
+float TELEPATHY_LOAD_FLOAT(Telepathy* telepathy, unsigned long long int address)
 {
 	Win_Telepathy *win_telepathy = (Win_Telepathy*)telepathy->internal;
 	
