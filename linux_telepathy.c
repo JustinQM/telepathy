@@ -19,7 +19,7 @@ typedef struct Linux_Telepathy
     struct iovec iovRemote[1];
 }Linux_Telepathy;
 
-void TELEPATHY_INIT(Telepathy* telepathy,char* name)
+void TELEPATHY_INIT(Telepathy* telepathy, const char* name)
 {
     telepathy->internal = malloc(sizeof(Linux_Telepathy));
     Linux_Telepathy* lin_telepathy = (Linux_Telepathy*)telepathy->internal;
@@ -27,7 +27,7 @@ void TELEPATHY_INIT(Telepathy* telepathy,char* name)
     TELEPATHY_GET_WINDOW_HANDLE(telepathy,name);
 }
 
-void TELEPATHY_GET_WINDOW_HANDLE(Telepathy* telepathy, char* name)
+void TELEPATHY_GET_WINDOW_HANDLE(Telepathy* telepathy, const char* name)
 {
     Linux_Telepathy* lin_telepathy = (Linux_Telepathy*)telepathy->internal;
 
