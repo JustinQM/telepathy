@@ -135,6 +135,20 @@ float TELEPATHY_LOAD_FLOAT(Telepathy* telepathy, unsigned long long int address)
 	return result;
 }
 
+void TELEPATHY_LOAD_STRING(Telepathy* telepathy, unsigned long long int address, char** dest, unsigned long long int length)
+{
+	if (length < 1) return;
+
+	*dest = (char*)malloc(sizeof(char) * length);
+
+	for (int i = 0; i < length; i++)
+	{
+		*(*dest + i) = TELEPATHY_LOAD_BYTE(telepathy, address + i);
+	}
+
+	*(*dest + length) = '\0';
+}
+
 void TELEPATHY_LOAD_UNITYSTRING(Telepathy* telepathy, unsigned long long int address, char** dest)
 {
 	address = TELEPATHY_LOAD_UINT(telepathy, address);
