@@ -139,18 +139,18 @@ void TELEPATHY_LOAD_UNITYSTRING(Telepathy* telepathy, unsigned long long int add
 {
 	address = TELEPATHY_LOAD_UINT(telepathy, address);
 
-	UINT64 length = TELEPATHY_LOAD_INT(telepathy, address + 0x10) + 1;
+	UINT64 length = TELEPATHY_LOAD_UINT(telepathy, address + 0x10) + 1;
 
-	if (length == 0x1) return;
+	if (length < 1) return;
 
 	*dest = (char*)malloc(sizeof(char) * length);
 
-	UINT64 stringOffset = 0x14;
-
 	for (int i = 0; i < length; i++)
 	{
-		*(*dest + i) = TELEPATHY_LOAD_BYTE(telepathy, address + stringOffset + (i*2));
+		*(*dest + i) = TELEPATHY_LOAD_BYTE(telepathy, address + 0x14 + (i*2));
 	}
+
+	*(*dest + (length*2)) = '\0';
 }
 
 #endif

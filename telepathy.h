@@ -18,4 +18,6 @@ unsigned long long int TELEPATHY_LOAD_UINT(Telepathy* telepathy, unsigned long l
 long long int TELEPATHY_LOAD_INT(Telepathy* telepathy, unsigned long long int address);
 char TELEPATHY_LOAD_BYTE(Telepathy* telepathy, unsigned long long int address);
 float TELEPATHY_LOAD_FLOAT(Telepathy* telepathy, unsigned long long int address);
+void TELEPATHY_LOAD_STRING(Telepathy* telepathy, unsigned long long int address, char** dest, unsigned long long int length);
+
 void TELEPATHY_LOAD_UNITYSTRING(Telepathy* telepathy, unsigned long long int address, char** dest);
